@@ -1,0 +1,30 @@
+name: dew it Python
+
+on:
+    workflow_dispatch:
+
+jobs:
+  Python:
+    name: dew it in Python
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up graalvm to gen data
+        uses: graalvm/setup-graalvm@v1
+        with:
+            distribution: 'graalvm'
+            version: '22.3.2'
+            java-version: '21.0.2'
+            components: 'native-image'
+      - name: BIG FAT DATA
+        run: |
+            mvn clean install
+            ./create_measurements.sh 1000000000
+            ls -lrthS
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12-dev'
+      - name: With Python we run
+        run: python dew_it.py

@@ -1,0 +1,32 @@
+name: dew it GraalVM 21.0.2 - thomaswue
+
+on:
+    workflow_dispatch:
+
+jobs:
+  generate-data:
+    name: dew thomaswue
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - uses: graalvm/setup-graalvm@v1
+        with:
+            # distribution: 'graalvm-community'
+            distribution: 'graalvm'
+            version: '22.3.2'
+            java-version: '21.0.2'
+            components: 'native-image'
+      - name: check JDK
+        run: |
+            java -XX:+UnlockDiagnosticVMOptions -XX:+PrintFlagsFinal -version
+      - name: gen_data
+        run: |
+            mvn clean install
+            ./create_measurements.sh 1000000000
+            ls -lrthS
+
+      - name: cal_avg
+        run: |
+            ./prepare_thomaswue.sh
+            time ./calculate_average_thomaswue.sh

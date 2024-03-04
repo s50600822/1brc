@@ -1,0 +1,33 @@
+name: dew it Rust
+
+on:
+    workflow_dispatch:
+
+jobs:
+  Rusty:
+    name: dew it in Rust
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up graalvm to gen data
+        uses: graalvm/setup-graalvm@v1
+        with:
+            # distribution: 'graalvm-community'
+            distribution: 'graalvm'
+            version: '22.3.2'
+            java-version: '21.0.2'
+            components: 'native-image'
+      - name: BIG FAT DATA
+        run: |
+            mvn clean install
+            ./create_measurements.sh 1000000000
+            ls -lrthS
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: With Rust we run
+        run: |
+          mv -v measurements.txt ./rust/measurements.txt
+          cd rust
+          cargo build --release
+          time ./target/release/rs-1brc measurements.txt

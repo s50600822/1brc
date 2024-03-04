@@ -1,0 +1,24 @@
+name: GenData
+
+on:
+    workflow_dispatch:
+
+jobs:
+  generate-data:
+    name: Generate Data
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      #Created file with 1,000,000,000 measurements in 41 1306 ms - Corretto (THIS ONE)
+      #Created file with 1,000,000,000 measurements in 16 7354 ms - Graalvm (much faster)
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: 21
+          distribution: 'corretto'
+      - name: BIG FAT DATA
+        run: |
+            mvn clean install
+            ./create_measurements.sh 1000000000
+            ls -lrthS
